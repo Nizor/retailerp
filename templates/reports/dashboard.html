@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+    <div style="border: 1px solid #ddd; padding: 1rem; flex:1">
+        <h3>Today's Sales</h3>
+        <p>Total: {{ daily_sales_total }}</p>
+        <p>Transactions: {{ daily_sales_count }}</p>
+    </div>
+    <div style="border: 1px solid #ddd; padding: 1rem; flex:1">
+        <h3>Low Stock Alerts</h3>
+        {% if low_stock %}
+        <ul>
+            {% for product in low_stock %}
+            <li>{{ product.name }}: {{ product.stock }} (Reorder at {{ product.reorder_level }})</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>All stock levels are okay.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div>
+    <h2>Top Selling Products</h2>
+    <table>
+        <thead><tr><th>Product</th><th>Quantity Sold</th></tr></thead>
+        <tbody>
+            {% for item in top_products %}
+            <tr><td>{{ item.product__name }}</td><td>{{ item.total_qty }}</td></tr>
+            {% empty %}
+            <tr><td colspan="2">No sales yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

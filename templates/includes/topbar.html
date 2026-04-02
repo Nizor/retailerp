@@ -1,0 +1,8 @@
+<div class="topbar">
+    <div class="user-info">
+        Welcome, {{ user.username }} ({{ user.profile.role }})
+    </div>
+    <div class="logout">
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>

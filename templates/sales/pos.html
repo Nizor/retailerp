@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Point of Sale{% endblock %}
+
+{% block content %}
+<h1>Point of Sale</h1>
+
+<div style="display: flex; gap: 2rem;">
+    <div style="flex: 2;">
+        <h2>Products</h2>
+        <table>
+            <thead>
+                <tr><th>Name</th><th>Price</th><th>Stock</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" name="action" value="add">Add</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="flex: 1;">
+        <h2>Cart</h2>
+        {% if cart_items %}
+        <table>
+            <thead><tr><th>Product</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <button type="submit" name="action" value="remove">X</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Total: {{ total }}</strong></p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="action" value="checkout">Checkout</button>
+        </form>
+        {% else %}
+        <p>Cart is empty.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

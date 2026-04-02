@@ -1,0 +1,13 @@
+<div class="sidebar">
+    <div class="logo">Retail ERP</div>
+    <nav>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'inventory:product_list' %}">Products</a>
+        <a href="{% url 'sales:pos' %}">POS</a>
+        <a href="{% url 'customers:customer_list' %}">Customers</a>
+        <a href="{% url 'suppliers:supplier_list' %}">Suppliers</a>
+        <a href="{% url 'purchases:purchase_list' %}">Purchases</a>
+        <a href="{% url 'accounting:ledger' %}">Accounting</a>
+        <a href="{% url 'reports:index' %}">Reports</a>
+    </nav>
+</div>
