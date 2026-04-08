@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from reports.views import DashboardView
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,4 +14,5 @@ urlpatterns = [
     path('purchases/', include('purchases.urls')),
     path('accounting/', include('accounting.urls')),
     path('reports/', include('reports.urls')),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]

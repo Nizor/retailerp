@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Receipt</h1>
+<p>Transaction #{{ transaction.id }}</p>
+<p>Date: {{ transaction.created_at|date:"Y-m-d H:i" }}</p>
+<p>Cashier: {{ transaction.user.username }}</p>
+<p>Customer: {{ transaction.customer.name|default:"Walk-in" }}</p>
+<table>
+    <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+    <tbody>
+        {% for item in transaction.items.all %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p><strong>Grand Total: {{ transaction.total }}</strong></p>
+<a href="{% url 'sales:pos' %}">New Sale</a>
+{% endblock %}

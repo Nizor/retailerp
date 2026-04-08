@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Daily Sales Report - {{ date }}</h1>
+<p><strong>Total Sales: {{ daily_total }}</strong></p>
+<table>
+    <thead>
+        <tr><th>Time</th><th>Cashier</th><th>Customer</th><th>Items</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+        {% for txn in transactions %}
+        <tr>
+            <td>{{ txn.created_at|time:"H:i" }}</td>
+            <td>{{ txn.user.username }}</td>
+            <td>{{ txn.customer.name|default:"Walk-in" }}</td>
+            <td>{{ txn.items.count }}</td>
+            <td>{{ txn.total }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No sales today.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pagination">...</div>
+{% endblock %}

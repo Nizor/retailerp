@@ -1,9 +1,9 @@
 # reports/views.py
-from django.views.generic import TemplateView
-from django.db.models import Sum, Count, F
+from django.views.generic import TemplateView, ListView
+from django.db.models import Sum, Count, F, Q
 from sales.models import Transaction, TransactionItem
 from inventory.models import Product
-from datetime import date
+from datetime import date, timedelta
 
 class DashboardView(TemplateView):
     template_name = 'reports/dashboard.html'
@@ -33,3 +33,24 @@ class DashboardView(TemplateView):
 
 class ReportIndexView(TemplateView):
     template_name = 'reports/index.html'
+
+class DailySalesReportView(ListView):
+    model = Transaction
+    template_name = 'reports/daily_sales.html'
+    context_object_name = 'transactions'
+    paginate_by = 20
+
+    def get_queryset(self):
+        today = date.today()
+        return Transaction.objects.filter(
+            created_at__date=today,
+            status='completed'
+        ).select_related('user', 'customer').prefetch_related('items')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = date.today()
+        total = Transaction.objects.filter(created_at__date=today, status='completed').aggregate(total=Sum('total'))['total'] or 0
+        context['daily_total'] = total
+        context['date'] = today
+        return context
