@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Confirm Receipt of Purchase Order #{{ object.id }}</h1>
+<p>Supplier: {{ object.supplier.name }}</p>
+<p>Total: {{ object.total }}</p>
+<form method="post">
+    {% csrf_token %}
+    <p>Are you sure you want to mark this order as received? Stock will be updated.</p>
+    <button type="submit">Yes, Receive Order</button>
+    <a href="{% url 'purchases:list' %}">Cancel</a>
+</form>
+{% endblock %}

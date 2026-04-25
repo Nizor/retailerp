@@ -32,6 +32,25 @@
         </table>
     </div>
 
+
+    <div style="margin-bottom: 1rem;">
+        <label>Customer: </label>
+        <select id="customer-select" name="customer_id">
+            <option value="">Walk-in Customer</option>
+            {% for cust in customers %}
+            <option value="{{ cust.id }}">{{ cust.name }}</option>
+            {% endfor %}
+        </select>
+        <button id="quick-customer-btn" type="button">+ New Customer</button>
+    </div>
+
+    <div id="quick-customer-modal" style="display:none; border:1px solid #ccc; padding:1rem; margin:1rem 0;">
+        <h3>New Customer</h3>
+        {% include "customers/_customer_form.html" %}
+        <button id="close-modal">Cancel</button>
+    </div>
+
+
     <div style="flex: 1;">
         <h2>Cart</h2>
         {% if cart_items %}
@@ -64,4 +83,36 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.getElementById('quick-customer-btn').onclick = function() {
+        document.getElementById('quick-customer-modal').style.display = 'block';
+    };
+    document.getElementById('close-modal').onclick = function() {
+        document.getElementById('quick-customer-modal').style.display = 'none';
+    };
+    document.getElementById('quick-customer-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+        const data = await response.json();
+        if (data.id) {
+            const select = document.getElementById('customer-select');
+            const option = document.createElement('option');
+            option.value = data.id;
+            option.text = data.name;
+            select.appendChild(option);
+            select.value = data.id;
+            document.getElementById('quick-customer-modal').style.display = 'none';
+            form.reset();
+        } else {
+            alert('Error: ' + JSON.stringify(data.errors));
+        }
+    };
+</script>
+
 {% endblock %}

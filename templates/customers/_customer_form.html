@@ -1,0 +1,7 @@
+<form id="quick-customer-form" method="post" action="{% url 'customers:quick_create' %}">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Customer name" required>
+    <input type="text" name="phone" placeholder="Phone">
+    <input type="email" name="email" placeholder="Email">
+    <button type="submit">Add Customer</button>
+</form>

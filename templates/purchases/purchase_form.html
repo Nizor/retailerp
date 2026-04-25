@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Create Purchase Order</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div style="margin-bottom: 1rem;">
+        <label>Supplier:</label><br>
+        {{ form.supplier }}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <label>Expected Delivery:</label><br>
+        {{ form.expected_date }}
+    </div>
+
+    <hr>
+
+    <h3>Product Item</h3>
+    <div style="margin-bottom: 1rem;">
+        <label>Product:</label><br>
+        {{ item_form.product }}
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label>Quantity:</label><br>
+        {{ item_form.quantity }}
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <label>Cost per unit:</label><br>
+        {{ item_form.cost }}
+    </div>
+
+    <button type="submit">Create Order</button>
+    <a href="{% url 'purchases:list' %}">Cancel</a>
+</form>
+{% endblock %}

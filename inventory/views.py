@@ -2,6 +2,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from .models import Product
 from .forms import ProductForm
+from users.mixins import ManagerRequiredMixin
 
 class ProductListView(ListView):
     model = Product
@@ -10,7 +11,7 @@ class ProductListView(ListView):
     paginate_by = 20
     queryset = Product.objects.select_related('category').all()
 
-class ProductCreateView(CreateView):
+class ProductCreateView(ManagerRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'inventory/product_form.html'

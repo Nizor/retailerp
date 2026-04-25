@@ -7,8 +7,10 @@ from .services import POSService
 from inventory.models import Product
 from django.views.generic import DetailView
 from .models import Transaction
+from customers.models import Customer
+from users.mixins import CashierRequiredMixin
 
-class POSView(LoginRequiredMixin, View):
+class POSView(CashierRequiredMixin, View):
     template_name = 'sales/pos.html'
     login_url = '/users/login/'   # absolute URL to avoid namespace issues
 
@@ -27,12 +29,15 @@ class POSView(LoginRequiredMixin, View):
                 'quantity': qty,
                 'total': item_total,
             })
+        customers = Customer.objects.all().only('id', 'name')[:100]
         context = {
             'cart_items': cart_items,
             'total': total,
             'products': Product.objects.filter(is_active=True).only('id', 'name', 'price', 'stock')[:50],
+            'customers': customers,
         }
         return render(request, self.template_name, context)
+        
 
     def post(self, request):
         action = request.POST.get('action')
@@ -64,7 +69,7 @@ class POSView(LoginRequiredMixin, View):
 
         return redirect('sales:pos')
     
-    
+
 class ReceiptView(LoginRequiredMixin, DetailView):
     model = Transaction
     template_name = 'sales/receipt.html'
