@@ -1,10 +1,59 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>{% if form.instance.pk %}Edit Product{% else %}Add Product{% endif %}</h1>
+<h1>{% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}</h1>
+
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Name:</label><br>
+        {{ form.name }}
+        {% if form.name.errors %}<span style="color: #c00;">{{ form.name.errors }}</span>{% endif %}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>SKU:</label><br>
+        {{ form.sku }}
+        {% if form.sku.errors %}<span style="color: #c00;">{{ form.sku.errors }}</span>{% endif %}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Barcode (optional):</label><br>
+        {{ form.barcode }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Category:</label><br>
+        {{ form.category }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Price:</label><br>
+        {{ form.price }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Cost:</label><br>
+        {{ form.cost }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Current Stock:</label><br>
+        {{ form.stock }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Reorder Level:</label><br>
+        {{ form.reorder_level }}
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label>Active:</label><br>
+        {{ form.is_active }}
+    </div>
+    
     <button type="submit">Save</button>
+    <a href="{% url 'inventory:product_list' %}">Cancel</a>
 </form>
-<a href="{% url 'inventory:product_list' %}">Cancel</a>
 {% endblock %}
