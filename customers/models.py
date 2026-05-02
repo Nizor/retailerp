@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, db_index=True)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
     address = models.TextField(blank=True)
@@ -12,6 +12,10 @@ class Customer(models.Model):
 
     class Meta:
         ordering = ['name']
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['phone']),
+        ]
 
     def __str__(self):
         return self.name

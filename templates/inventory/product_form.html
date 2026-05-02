@@ -1,59 +1,126 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h1>{% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}</h1>
 
-<form method="post">
+<form method="post" id="product-form">
     {% csrf_token %}
-    
+
+    <!-- Basic Information -->
     <div style="margin-bottom: 1rem;">
         <label>Name:</label><br>
         {{ form.name }}
         {% if form.name.errors %}<span style="color: #c00;">{{ form.name.errors }}</span>{% endif %}
     </div>
-    
+
     <div style="margin-bottom: 1rem;">
-        <label>SKU:</label><br>
+        <label>SKU (Stock Keeping Unit):</label><br>
         {{ form.sku }}
         {% if form.sku.errors %}<span style="color: #c00;">{{ form.sku.errors }}</span>{% endif %}
     </div>
-    
+
     <div style="margin-bottom: 1rem;">
-        <label>Barcode (optional):</label><br>
+        <label>Barcode (auto‑generated if left blank):</label><br>
         {{ form.barcode }}
+        {% if form.barcode.errors %}<span style="color: #c00;">{{ form.barcode.errors }}</span>{% endif %}
     </div>
-    
+
+    <!-- Category & Group -->
     <div style="margin-bottom: 1rem;">
         <label>Category:</label><br>
         {{ form.category }}
+        {% if form.category.errors %}<span style="color: #c00;">{{ form.category.errors }}</span>{% endif %}
     </div>
-    
+
     <div style="margin-bottom: 1rem;">
-        <label>Price:</label><br>
-        {{ form.price }}
+        <label>Group (sub‑category, optional):</label><br>
+        {{ form.group }}
+        {% if form.group.errors %}<span style="color: #c00;">{{ form.group.errors }}</span>{% endif %}
     </div>
-    
+
+    <!-- Pricing -->
     <div style="margin-bottom: 1rem;">
-        <label>Cost:</label><br>
+        <label>Cost (purchase price):</label><br>
         {{ form.cost }}
+        {% if form.cost.errors %}<span style="color: #c00;">{{ form.cost.errors }}</span>{% endif %}
     </div>
-    
+
+    <div style="margin-bottom: 1rem;">
+        <label>Markup (%):</label><br>
+        {{ form.markup_percentage }}
+        {% if form.markup_percentage.errors %}<span style="color: #c00;">{{ form.markup_percentage.errors }}</span>{% endif %}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <label>
+            {{ form.auto_price_from_markup }}
+            Auto‑calculate selling price from cost + markup
+        </label>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <label>Selling Price (manual override allowed if auto‑calc is off):</label><br>
+        {{ form.price }}
+        {% if form.price.errors %}<span style="color: #c00;">{{ form.price.errors }}</span>{% endif %}
+    </div>
+
+    <!-- Stock -->
     <div style="margin-bottom: 1rem;">
         <label>Current Stock:</label><br>
         {{ form.stock }}
+        {% if form.stock.errors %}<span style="color: #c00;">{{ form.stock.errors }}</span>{% endif %}
     </div>
-    
+
     <div style="margin-bottom: 1rem;">
-        <label>Reorder Level:</label><br>
+        <label>Reorder Level (when stock goes below):</label><br>
         {{ form.reorder_level }}
+        {% if form.reorder_level.errors %}<span style="color: #c00;">{{ form.reorder_level.errors }}</span>{% endif %}
     </div>
-    
+
+    <!-- Status -->
     <div style="margin-bottom: 1rem;">
-        <label>Active:</label><br>
-        {{ form.is_active }}
+        <label>
+            {{ form.is_active }}
+            Active (visible in POS)
+        </label>
     </div>
-    
-    <button type="submit">Save</button>
+
+    <button type="submit">Save Product</button>
     <a href="{% url 'inventory:product_list' %}">Cancel</a>
 </form>
+
+<script>
+    (function() {
+        // Get elements
+        const costInput = document.querySelector('#id_cost');
+        const markupInput = document.querySelector('#id_markup_percentage');
+        const priceInput = document.querySelector('#id_price');
+        const autoCheckbox = document.querySelector('#id_auto_price_from_markup');
+
+        if (!costInput || !markupInput || !priceInput || !autoCheckbox) return;
+
+        function updatePrice() {
+            if (autoCheckbox.checked) {
+                const cost = parseFloat(costInput.value) || 0;
+                const markup = parseFloat(markupInput.value) || 0;
+                const calculatedPrice = cost * (1 + markup / 100);
+                priceInput.value = calculatedPrice.toFixed(2);
+                // Make price field read‑only when auto mode is on
+                priceInput.readOnly = true;
+            } else {
+                // Allow manual editing when auto mode is off
+                priceInput.readOnly = false;
+            }
+        }
+
+        // Run once on page load
+        updatePrice();
+
+        // Add event listeners
+        costInput.addEventListener('input', updatePrice);
+        markupInput.addEventListener('input', updatePrice);
+        autoCheckbox.addEventListener('change', updatePrice);
+    })();
+</script>
 {% endblock %}
