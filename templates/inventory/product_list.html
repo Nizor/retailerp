@@ -25,7 +25,12 @@
             <td>{{ product.sku }}</td>
             <td>{{ product.category.name }}</td>
             <td>{{ product.price }}</td>
-            <td>{{ product.stock }}</td>
+            <td>
+                {{ product.stock }}
+                {% if product.stock <= product.reorder_level %}
+                    <span class="badge badge-warning">Low stock</span>
+                {% endif %}
+            </td>
             <td><a href="{% url 'inventory:product_edit' product.id %}">Edit</a></td>
         </tr>
         {% empty %}

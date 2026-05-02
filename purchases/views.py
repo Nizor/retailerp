@@ -1,10 +1,10 @@
 from django.views.generic import ListView, CreateView, UpdateView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import transaction
 from .models import PurchaseOrder, PurchaseItem
-from .forms import PurchaseOrderForm, PurchaseItemForm
+from .forms import PurchaseOrderForm, PurchaseItemFormSet
 
 class PurchaseOrderListView(ListView):
     model = PurchaseOrder
@@ -20,42 +20,39 @@ class PurchaseOrderCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'item_form' not in context:
-            context['item_form'] = PurchaseItemForm()
+        if self.request.POST:
+            context['formset'] = PurchaseItemFormSet(self.request.POST)
+        else:
+            context['formset'] = PurchaseItemFormSet()
         return context
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        item_form = PurchaseItemForm(request.POST)
-        if form.is_valid() and item_form.is_valid():
-            return self.form_valid(form, item_form)
-        else:
-            return self.form_invalid(form, item_form)
-
-    def form_valid(self, form, item_form):
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
         with transaction.atomic():
-            order = form.save(commit=False)
-            order.total = 0
-            order.save()
-            product = item_form.cleaned_data['product']
-            quantity = item_form.cleaned_data['quantity']
-            cost = item_form.cleaned_data['cost']
-            PurchaseItem.objects.create(
-                order=order,
-                product=product,
-                quantity=quantity,
-                cost=cost,
-                total=quantity * cost
-            )
-            order.total = quantity * cost
-            order.save()
-        messages.success(self.request, 'Purchase order created successfully.')
+            self.object = form.save(commit=False)
+            self.object.total = 0
+            self.object.save()
+            if formset.is_valid():
+                total = 0
+                for item_form in formset:
+                    if item_form.cleaned_data and not item_form.cleaned_data.get('DELETE', False):
+                        item = item_form.save(commit=False)
+                        item.order = self.object
+                        item.total = item.quantity * item.cost
+                        item.save()
+                        total += item.total
+                self.object.total = total
+                self.object.save()
+                messages.success(self.request, 'Purchase order created successfully.')
+                return redirect(self.success_url)
+            else:
+                self.object.delete()  # rollback
+                return self.form_invalid(form)
         return redirect(self.success_url)
 
-    def form_invalid(self, form, item_form):
-        return self.render_to_response(
-            self.get_context_data(form=form, item_form=item_form)
-        )
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
 
 class ReceivePurchaseView(UpdateView):
     model = PurchaseOrder

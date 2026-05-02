@@ -2,37 +2,92 @@
 
 {% block content %}
 <h1>Create Purchase Order</h1>
-
-<form method="post">
+<form method="post" id="purchase-form">
     {% csrf_token %}
-
     <div style="margin-bottom: 1rem;">
         <label>Supplier:</label><br>
         {{ form.supplier }}
     </div>
-
     <div style="margin-bottom: 1rem;">
         <label>Expected Delivery:</label><br>
         {{ form.expected_date }}
     </div>
 
     <hr>
-
-    <h3>Product Item</h3>
-    <div style="margin-bottom: 1rem;">
-        <label>Product:</label><br>
-        {{ item_form.product }}
-    </div>
-    <div style="margin-bottom: 1rem;">
-        <label>Quantity:</label><br>
-        {{ item_form.quantity }}
-    </div>
-    <div style="margin-bottom: 1rem;">
-        <label>Cost per unit:</label><br>
-        {{ item_form.cost }}
-    </div>
-
+    <h3>Order Items</h3>
+    <table id="item-table" style="width:100%; margin-bottom:1rem;">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Cost per unit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item_form in formset %}
+            <tr class="item-row">
+                <td>{{ item_form.id }}{{ item_form.product }}</td>
+                <td>{{ item_form.quantity }}</td>
+                <td>{{ item_form.cost }}</td>
+                <td>{% if item_form.instance.pk %}{{ item_form.DELETE }}{% else %}<button type="button" class="remove-row">Remove</button>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" id="add-item">Add another product</button>
+    <hr>
+    {{ formset.management_form }}
     <button type="submit">Create Order</button>
     <a href="{% url 'purchases:list' %}">Cancel</a>
 </form>
+
+<script>
+    // Dynamic row management
+    const addButton = document.getElementById('add-item');
+    const tableBody = document.querySelector('#item-table tbody');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+
+    addButton.addEventListener('click', function() {
+        const newIndex = parseInt(totalForms.value);
+        const newRow = document.createElement('tr');
+        newRow.className = 'item-row';
+        // You need to replicate the form fields with dynamic index
+        // Simplest: clone the last row and reset values
+        const lastRow = tableBody.lastElementChild;
+        if (lastRow) {
+            const clone = lastRow.cloneNode(true);
+            // Update name/id attributes
+            clone.querySelectorAll('[name]').forEach(field => {
+                const name = field.getAttribute('name').replace(/items-\d+/, `items-${newIndex}`);
+                field.setAttribute('name', name);
+                field.setAttribute('id', `id_${name}`);
+                if (field.type !== 'checkbox') field.value = '';
+            });
+            // Clear delete checkbox
+            const deleteCheck = clone.querySelector('[type="checkbox"]');
+            if (deleteCheck) deleteCheck.checked = false;
+            tableBody.appendChild(clone);
+        } else {
+            // If no rows, you'd need to generate from a template – but formset always has at least 'extra' rows.
+        }
+        totalForms.value = newIndex + 1;
+    });
+
+    // Remove row (client side only – the formset's DELETE flag will handle deletion)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-row')) {
+            const row = e.target.closest('.item-row');
+            // If the row has a DELETE checkbox (existing item), check it and hide row
+            const deleteCheck = row.querySelector('[type="checkbox"][name*="DELETE"]');
+            if (deleteCheck) {
+                deleteCheck.checked = true;
+                row.style.display = 'none';
+            } else {
+                row.remove();
+                // update TOTAL_FORMS? Not necessary because the extra row was not yet saved.
+            }
+        }
+    });
+</script>
 {% endblock %}

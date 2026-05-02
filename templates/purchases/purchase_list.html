@@ -22,9 +22,14 @@
             <td>{{ order.id }}</td>
             <td>{{ order.supplier.name }}</td>
             <td>{{ order.order_date }}</td>
+            <td>{{ order.items.count }}</td>
             <td>{{ order.expected_date|default:"—" }}</td>
             <td>{{ order.total }}</td>
-            <td>{{ order.get_status_display }}</td>
+            <td>
+                <span class="badge {% if order.status == 'pending' %}badge-warning{% else %}badge-success{% endif %}">
+                    {{ order.get_status_display }}
+                </span>
+            </td>
             <td>
                 {% if order.status == 'pending' %}
                     <form method="post" action="{% url 'purchases:receive' order.id %}">

@@ -14,5 +14,6 @@ urlpatterns = [
     path('purchases/', include('purchases.urls')),
     path('accounting/', include('accounting.urls')),
     path('reports/', include('reports.urls')),
+    path('expenses/', include('expenses.urls')),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
