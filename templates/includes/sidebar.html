@@ -2,11 +2,19 @@
     <div class="logo">Retail ERP</div>
     <nav>
         <a href="{% url 'dashboard' %}">Dashboard</a>
-        <a href="{% url 'inventory:product_list' %}">Products</a>
+        <div class="nav-group">
+            <div class="nav-group-header" id="productSetupToggle">
+                <span class="arrow">▶</span> <span>Product Setup</span>
+            </div>
+            <div class="nav-group-items" id="productSetupItems" style="display: none;">
+                <a href="{% url 'inventory:product_list' %}">Products</a>
+                <a href="{% url 'purchases:list' %}">Purchases</a>
+                <a href="{% url 'inventory:stock_analytics' %}">Stocks</a>
+            </div>
+        </div>
         <a href="{% url 'sales:pos' %}">POS</a>
         <a href="{% url 'customers:list' %}">Customers</a>
         <a href="{% url 'suppliers:list' %}">Suppliers</a>
-        <a href="{% url 'purchases:list' %}">Purchases</a>
         <a href="{% url 'expenses:list' %}">Expenses</a>
         <a href="{% url 'accounting:ledger' %}">Accounting</a>
         <a href="{% url 'reports:index' %}">Reports</a>

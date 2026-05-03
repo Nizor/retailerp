@@ -319,3 +319,53 @@ button.danger:hover, a.danger:hover {
         margin-right: 1rem;
     }
 }
+/* Sidebar nested group */
+.nav-group {
+    margin: 0;
+}
+
+.nav-group-title {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #ecf0f1;
+    cursor: default;
+    border-left: 3px solid transparent;
+    letter-spacing: 0.3px;
+}
+
+.nav-group-items {
+    margin-left: 1rem;
+}
+
+.nav-group-items a {
+    display: block;
+    padding: 0.6rem 1rem 0.6rem 2rem;
+    font-size: 0.9rem;
+}
+
+.nav-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    color: #ecf0f1;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.nav-group-header:hover {
+    background: #2c3e50;
+}
+
+/* Arrow indicator */
+.arrow {
+    font-size: 0.7rem;
+    display: inline-block;
+    width: 16px;
+}
+
+/* Sub‑items container */
+.nav-group-items {
+    margin-left: 2rem;   /* indent */
+}
